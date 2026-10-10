@@ -1,18 +1,33 @@
 
-"""Flask web application for detecting emotions in text."""
+"""
+Emotion Detection Flask Application.
+
+This module provides a web interface for detecting emotions
+in user-provided text using the EmotionDetection package.
+"""
 
 from flask import Flask, render_template, request
-from EmotionDetection import emotion_detector
+from EmotionDetection.emotion_detection import emotion_detector
+
 
 app = Flask(__name__)
 
 
 @app.route("/emotionDetector")
 def detect_emotion():
-    """Analyze the supplied text and return emotion scores."""
+    """
+    Analyze the text provided by the user and display
+    the emotion scores and dominant emotion.
+
+    Returns:
+        str: Formatted emotion analysis result or error message.
+    """
     text_to_analyze = request.args.get("textToAnalyze", "")
 
     response = emotion_detector(text_to_analyze)
+
+    if response["dominant_emotion"] is None:
+        return "Invalid text! Please try again!"
 
     anger = response["anger"]
     disgust = response["disgust"]
@@ -22,9 +37,11 @@ def detect_emotion():
     dominant_emotion = response["dominant_emotion"]
 
     return (
-        f"For the given statement, the system response is "
-        f"'anger': {anger}, 'disgust': {disgust}, "
-        f"'fear': {fear}, 'joy': {joy} and "
+        "For the given statement, the system response is "
+        f"'anger': {anger}, "
+        f"'disgust': {disgust}, "
+        f"'fear': {fear}, "
+        f"'joy': {joy} and "
         f"'sadness': {sadness}. "
         f"The dominant emotion is {dominant_emotion}."
     )
@@ -32,7 +49,12 @@ def detect_emotion():
 
 @app.route("/")
 def render_index_page():
-    """Render the application home page."""
+    """
+    Render the home page of the emotion detection application.
+
+    Returns:
+        str: Rendered HTML template.
+    """
     return render_template("index.html")
 
 
